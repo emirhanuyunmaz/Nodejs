@@ -12,7 +12,7 @@ function circleCircumference (r){
     console.log(`Dairenin yarıçapı : ${r} Çevresi : ${circumference}`)
 }
 
-
+//Burada circle.js içerisindeki değerleri dış dünyaya aktarma işlemi yapılmaktadır.
 module.exports = {
     circleCircumference,
     circleArea
