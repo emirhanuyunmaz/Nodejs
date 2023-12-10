@@ -1,14 +1,25 @@
-const express = require("express")
+const express = require('express');
 
-const app = express()
+const app = express();
 
-const path = require("path")
+const path = require('path');
 
-const ejs = require("ejs")
+const ejs = require('ejs');
+
+const mongoose = require('mongoose');
+
+const fileUpload = require('express-fileupload');
+
+const methodOverride = require('method-override');
+
+const photoControllers = require('./controllers/photoControllers')
+
+const pageControllers = require('./controllers/pageControllers')
+
+mongoose.connect('mongodb://127.0.0.1:27017/pcat-test-db');
 
 //Template Engine
-app.set("view engine","ejs")
-
+app.set('view engine', 'ejs');
 
 // const myLogger = (req , res , next) => {
 //     console.log("LOG 1")
@@ -16,32 +27,32 @@ app.set("view engine","ejs")
 // }
 //app.use(myLogger)
 
-
 //Middlewares
-app.use(express.static('public'))
+app.use(express.static('public'));
+app.use(express.urlencoded({ extended: true })); //Bu işlem url deki datayı okumamızı sağlar.
+app.use(express.json()); //Buradaki işlem url deki data yı json formatına çevirir.
+app.use(fileUpload()); //Resmi yükleme işlemi için gerekli
+app.use(methodOverride("_method",{
+    methods :["POST","GET"]
+}))//Post ve GET işlemlerini yakalayıp put ve delete işlemi yapma işlemi 
 
 
 //Routes
-app.get("/",(req,res) => {
-    //Bu işlem bir syafanın ekranda gösterilmesi işlemini yapmaktadır.
-    //res.sendFile(path.resolve(__dirname,"temp/index.html"))
+app.get('/', photoControllers.getAllPhoto);
+app.get('/photos/edit/:id', photoControllers.editPhoto);
+app.get('/photos/:id',photoControllers.getPhoto);
+app.put('/photos/:id',photoControllers.updatePhoto);
+app.delete('/photos/:id',photoControllers.deletePhoto);
+app.post('/photos', photoControllers.addPhoto);
+app.get('/add',pageControllers.pagesAdd);
 
-    //Buradaki render eden ejs eklentisi öncelikle "views" klasörüne bakar ve oradaki dosyaları çalıştırır.
-    //Bu işlem yukarıdaki ile aynı tek fark olarak ejs formatındaki verileri göstermemizi sağlar
-    res.render("index")
 
-})
+app.get('/about', pageControllers.pagesAbout);
 
-app.get("/about",(req,res) => {
-    res.render("about")
-})
 
-app.get("/add",(req,res) => {
-    res.render("add")
-})
 
-const port = 3000
+const port = 3000;
 
 app.listen(port, () => {
-    console.log(`Server ${port} portunda çalışmaktadır.`)
-})
+  console.log(`Server ${port} portunda çalışmaktadır.`);
+});
